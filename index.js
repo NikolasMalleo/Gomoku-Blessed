@@ -39,10 +39,7 @@ screen.on('keypress', function(data, key) {
     program.normalBuffer();
     process.exit(0);
   }
-  if (key.name === 'c') {
-    program.write(gameBoard.length)
-  }
-  if (key.name === 'f'){
+  if (key.name === 'f' && checkWin() === 0){
     if (gameBoard[ya][xab] == "#"){
       if (b == 0){
         gameBoard[ya][xab] = "o"
@@ -55,7 +52,7 @@ screen.on('keypress', function(data, key) {
     }
     check = checkWin()
   }
-  if (key.name === 'w') {
+  if (key.name === 'w' && checkWin() === 0) {
     if (ya >= 0){
       ya = ya - 1
     }
@@ -64,7 +61,7 @@ screen.on('keypress', function(data, key) {
     }
     program.move(xa, ya)
   }
-  if (key.name === 's') {
+  if (key.name === 's' && checkWin() === 0) {
     if (ya >= 0){
     ya = ya + 1
     }
@@ -73,7 +70,7 @@ screen.on('keypress', function(data, key) {
     }
     program.move(xa, ya)
   }
-  if (key.name === 'a') {
+  if (key.name === 'a' && checkWin() === 0) {
     if (xa >= 0){
     xa = xa - 3
     }
@@ -83,7 +80,7 @@ screen.on('keypress', function(data, key) {
     program.move(xa, ya)
     xab = xa/3
   }
-  if (key.name === 'd') {
+  if (key.name === 'd' && checkWin() === 0) {
     if (xa >= 0){
     xa = xa + 3
     }
@@ -193,6 +190,42 @@ function checkWin(){
   }
   winPoints = 0
   winPointsAI = 0
+  if (xab > 3){
+    for (let n = 0; n < 5; n++){
+      if (gameBoard[ya][xab-n] === 'o')  {              
+        winPoints ++
+        if (winPoints === 5){
+           return 1
+        }
+        else if (gameBoard[ya][xab-n] === 'x'){
+          winPointsAI ++
+          if (winPointsAI === 5){
+            return 2
+          }
+        }
+      }
+    }
+  }
+  winPoints = 0
+  winPointsAI = 0
+  if (xab < 12){
+    for (let n = 0; n < 5; n++){
+      if (gameBoard[ya][xab+n] === 'o')  {              
+        winPoints ++
+        if (winPoints === 5){
+           return 1
+        }
+        else if (gameBoard[ya][xab+n] === 'x'){
+          winPointsAI ++
+          if (winPointsAI === 5){
+            return 2
+          }
+        }
+      }
+    }
+  }
+  winPoints = 0
+  winPointsAI = 0
   return 0
 }
 
@@ -229,6 +262,5 @@ setInterval(() => {
   else if (checkWin() === 1){
     box.setContent("you win");
   }
-  //program.write('Mouse wheel up at: ' + ya + ', ' + xab)
   screen.render();
 },100)
