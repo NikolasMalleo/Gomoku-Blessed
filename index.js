@@ -4,10 +4,13 @@ var blessed = require('blessed')
 , program = blessed.program();
 
 let xa = 0
-let ya = 0
+let xab = 0
 let b = 0
+let ya = 0
+let check = 0
 let gameBoard = []
 let currentGame;
+let win = 0
 
 const screen = blessed.screen({
   fastCSR: true
@@ -40,16 +43,17 @@ screen.on('keypress', function(data, key) {
     program.write(gameBoard.length)
   }
   if (key.name === 'f'){
-    if (gameBoard[ya][xa/3] == "#"){
+    if (gameBoard[ya][xab] == "#"){
       if (b == 0){
-        gameBoard[ya][xa/3] = "o"
-      b = 1
+        gameBoard[ya][xab] = "o"
+      b = 0
     }
       else if (b == 1){
-        gameBoard[ya][xa/3] = "x"
+        gameBoard[ya][xab] = "x"
         b = 0      
       }
     }
+    check = checkWin()
   }
   if (key.name === 'w') {
     if (ya >= 0){
@@ -77,6 +81,7 @@ screen.on('keypress', function(data, key) {
       xa = 0
     }
     program.move(xa, ya)
+    xab = xa/3
   }
   if (key.name === 'd') {
     if (xa >= 0){
@@ -86,6 +91,7 @@ screen.on('keypress', function(data, key) {
       xa = 0
     }
     program.move(xa, ya)
+    xab = xa/3
   }
 });
 
@@ -99,13 +105,98 @@ function makeMainList(){
     for (let y = 0; y < 16; y++) {
       if (y === 15) {
         tempArray.push('\n');
-      } else {
+      } 
+      else {
       tempArray.push('#');
-     }
+      }
     }
     gameBoard.push(tempArray);
   }
 };
+
+function checkWin(){
+  let winPoints = 0
+  let winPointsAI = 0
+  if ((xab < 12) && (ya < 12)){
+    for (let n = 0; n < 5; n++){
+      if (gameBoard[ya + n][xab + n] === 'o')  {
+        
+        winPoints = winPoints + 1
+        if (winPoints === 5){
+          return 1
+        }
+        else if (gameBoard[ya+n][xab+n] === 'x'){
+          winPointsAI ++
+          if (winPointsAI === 5){
+            return 2
+          }
+        }
+      }
+    }
+  }
+  winPoints = 0
+  winPointsAI = 0
+
+  if ((xab < 12) && (ya > 3)){
+    for (let n = 0; n < 5; n++){
+        if (gameBoard[ya-n][xab+n] === 'o')  {              
+        winPoints ++
+        if (winPoints === 5){
+           return 1
+        }
+      }
+      else if (gameBoard[ya-n][xab+n] === 'x'){
+        winPointsAI ++
+        if (winPointsAI === 5){
+          return 2
+        }
+      }
+    }
+  }
+  winPoints = 0
+  winPointsAI = 0
+    
+
+  if ((xab > 3) && (ya > 3)){
+    for (let n = 0; n < 5; n++){ 
+      if (gameBoard[ya-n][xab-n] === 'o')  {                
+        winPoints ++
+        if (winPoints === 5){
+           return 1
+        }
+        else if (gameBoard[ya-n][xab-n] === 'x'){
+          winPointsAI ++
+          if (winPointsAI === 5){
+            return 2
+          }
+        }
+      }
+    }
+  }
+  winPoints = 0
+  winPointsAI = 0
+  if ((xab > 3) && ya < 12){
+    for (let n = 0; n < 5; n++){
+      if (gameBoard[ya+n][xab-n] === 'o')  {              
+        winPoints ++
+        if (winPoints === 5){
+           return 1
+        }
+        else if (gameBoard[ya+n][xab-n] === 'x'){
+          winPointsAI ++
+          if (winPointsAI === 5){
+            return 2
+          }
+        }
+      }
+    }
+  }
+  winPoints = 0
+  winPointsAI = 0
+  return 0
+}
+
+  
 
 
 box.key('enter', function(ch, key) {
@@ -133,8 +224,11 @@ main();
 setInterval(() => {
   currentGame = gameBoard.slice(0);
   joinArray(currentGame);
-  if (win == 0){  
-    box.setContent(currentGame);
+  if (checkWin() === 0){
+    box.setContent(currentGame)}
+  else if (checkWin() === 1){
+    box.setContent("you win");
   }
+  //program.write('Mouse wheel up at: ' + ya + ', ' + xab)
   screen.render();
 },100)
