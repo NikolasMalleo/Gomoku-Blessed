@@ -3,15 +3,19 @@
 var blessed = require('blessed')
   , program = blessed.program();
 
-let xa = 21
-let xab = 7
+let xa = 0
+let xab = 0
 let b = 0
-let ya = 7
+let ya = 0
 let gameBoard = []
 let currentGame;
 let retryBoard = []
 let posibility = [0]
-let xy = [7, 7]
+let xy = [0, 0]
+let j = "_"
+let ax = "x"
+let ao = "o"
+
 
 const screen = blessed.screen({
   fastCSR: true
@@ -40,15 +44,26 @@ screen.on('keypress', function (data, key) {
     program.normalBuffer();
     process.exit(0);
   }
-  if (key.name === 'f' && checkWin() === 0) {
-    if (gameBoard[ya][xab] == "#") {
-      gameBoard[ya][xab] = "o"
+  if (key.name === 'f') {
+    if (xab > 0 && ya > 0 && xab < 15 && ya < 15)
+    {if (gameBoard[ya][xab] == j && checkWin() === 0) {
+      gameBoard[ya][xab] = ao
       AI();
-
-    }
-    checkWin()
+      checkWin()
+    }}
   }
-  if (key.name === 'w' && checkWin() === 0) {
+  if (key.name === 'g') {
+    if (ax === "x"){
+      ax = "o"
+      ao = "x"
+    }
+    else if (ax === "o"){
+      ax = "x"
+      ao = "o"
+    }
+    retry()
+  }
+  if (key.name === 'w') {
     if (ya >= 0) {
       ya = ya - 1
     }
@@ -57,7 +72,7 @@ screen.on('keypress', function (data, key) {
     }
     program.move(xa, ya)
   }
-  if (key.name === 's' && checkWin() === 0) {
+  if (key.name === 's') {
     if (ya >= 0) {
       ya = ya + 1
     }
@@ -66,7 +81,7 @@ screen.on('keypress', function (data, key) {
     }
     program.move(xa, ya)
   }
-  if (key.name === 'a' && checkWin() === 0) {
+  if (key.name === 'a') {
     if (xa >= 0) {
       xa = xa - 3
     }
@@ -76,7 +91,7 @@ screen.on('keypress', function (data, key) {
     program.move(xa, ya)
     xab = xa / 3
   }
-  if (key.name === 'd' && checkWin() === 0) {
+  if (key.name === 'd') {
     if (xa >= 0) {
       xa = xa + 3
     }
@@ -92,7 +107,7 @@ screen.key(['escape', 'q', 'C-c'], function (ch, key) {
   return process.exit(0);
 });
 
-function makeMainList() {
+function makeMainList(gameBoard) {
   for (let x = 0; x < 15; x++) {
     let tempArray = [];
     for (let y = 0; y < 16; y++) {
@@ -100,20 +115,20 @@ function makeMainList() {
         tempArray.push('\n');
       }
       else {
-        tempArray.push('#');
+        tempArray.push(j);
       }
     }
     gameBoard.push(tempArray);
   }
-  retryBoard = gameBoard
 };
 
 function checkWin() {
   let winPoints = 0
-  let winPointsAI = 0
+  if (xab > 0 && ya > 0 && xab < 15 && ya < 15)
+  {  
   if ((xab < 12) && (ya < 12)) {
     for (let n = 0; n < 5; n++) {
-      if (gameBoard[ya + n][xab + n] === 'o') {
+      if (gameBoard[ya + n][xab + n] === ao) {
 
         winPoints = winPoints + 1
         if (winPoints === 5) {
@@ -125,7 +140,7 @@ function checkWin() {
   winPoints = 0
   if ((xab < 12) && (ya > 3)) {
     for (let n = 0; n < 5; n++) {
-      if (gameBoard[ya - n][xab + n] === 'o') {
+      if (gameBoard[ya - n][xab + n] === ao) {
         winPoints++
         if (winPoints === 5) {
           return 1
@@ -136,7 +151,7 @@ function checkWin() {
   winPoints = 0
   if ((xab > 3) && (ya > 3)) {
     for (let n = 0; n < 5; n++) {
-      if (gameBoard[ya - n][xab - n] === 'o') {
+      if (gameBoard[ya - n][xab - n] === ao) {
         winPoints++
         if (winPoints === 5) {
           return 1
@@ -147,7 +162,7 @@ function checkWin() {
   winPoints = 0
   if ((xab > 3) && ya < 12) {
     for (let n = 0; n < 5; n++) {
-      if (gameBoard[ya + n][xab - n] === 'o') {
+      if (gameBoard[ya + n][xab - n] === ao) {
         winPoints++
         if (winPoints === 5) {
           return 1
@@ -158,7 +173,7 @@ function checkWin() {
   winPoints = 0
   if (xab > 3) {
     for (let n = 0; n < 5; n++) {
-      if (gameBoard[ya][xab - n] === 'o') {
+      if (gameBoard[ya][xab - n] === ao) {
         winPoints++
         if (winPoints === 5) {
           return 1
@@ -169,7 +184,7 @@ function checkWin() {
   winPoints = 0
   if (xab < 12) {
     for (let n = 0; n < 5; n++) {
-      if (gameBoard[ya][xab + n] === 'o') {
+      if (gameBoard[ya][xab + n] === ao) {
         winPoints++
         if (winPoints === 5) {
           return 1
@@ -180,7 +195,7 @@ function checkWin() {
   winPoints = 0
   if (ya > 3) {
     for (let n = 0; n < 5; n++) {
-      if (gameBoard[ya - n][xab] === 'o') {
+      if (gameBoard[ya - n][xab] === ao) {
         winPoints++
         if (winPoints === 5) {
           return 1
@@ -191,7 +206,7 @@ function checkWin() {
   winPoints = 0
   if (ya < 12) {
     for (let n = 0; n < 5; n++) {
-      if (gameBoard[ya + n][xab] === 'o') {
+      if (gameBoard[ya + n][xab] === ao) {
         winPoints++
         if (winPoints === 5) {
           return 1
@@ -199,7 +214,7 @@ function checkWin() {
       }
     }
   }
-  winPoints = 0
+  winPoints = 0}
   return 0
 }
 
@@ -222,7 +237,7 @@ function checkWinAI() {
     for (let w = 0; w < 15; w++) {
       if ((w < 11) && (q < 11)) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q + n][w + n] === 'x' && gameBoard[q][w] === 'x') {
+          if (gameBoard[q + n][w + n] === ax && gameBoard[q][w] === ax) {
             p++
             if (p === 5) { return 2 }
           }
@@ -232,7 +247,7 @@ function checkWinAI() {
 
       if ((w < 11) && (q > 3)) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q - n][w + n] === 'x' && gameBoard[q][w] === 'x') {
+          if (gameBoard[q - n][w + n] === ax && gameBoard[q][w] === ax) {
             p++
             if (p === 5) { return 2 }
           }
@@ -242,7 +257,7 @@ function checkWinAI() {
 
       if ((w > 3) && (q > 3)) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q - n][w - n] === 'x' && gameBoard[q][w] === 'x') {
+          if (gameBoard[q - n][w - n] === ax && gameBoard[q][w] === ax) {
             p++
             if (p === 5) { return 2 }
           }
@@ -252,7 +267,7 @@ function checkWinAI() {
 
       if ((w > 3) && q < 11) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q + n][w - n] === 'x' && gameBoard[q][w] === 'x') {
+          if (gameBoard[q + n][w - n] === ax && gameBoard[q][w] === ax) {
             p++
             if (p === 5) { return 2 }
           }
@@ -262,7 +277,7 @@ function checkWinAI() {
 
       if (w > 3) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q][w - n] === 'x' && gameBoard[q][w] === 'x') {
+          if (gameBoard[q][w - n] === ax && gameBoard[q][w] === ax) {
             p++
             if (p === 5) { return 2 }
           }
@@ -272,7 +287,7 @@ function checkWinAI() {
 
       if (w < 11) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q][w + n] === 'x' && gameBoard[q][w] === 'x') {
+          if (gameBoard[q][w + n] === ax && gameBoard[q][w] === ax) {
             p++
             if (p === 5) { return 2 }
           }
@@ -282,7 +297,7 @@ function checkWinAI() {
 
       if (q > 3) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q - n][w] === 'x' && gameBoard[q][w] === 'x') {
+          if (gameBoard[q - n][w] === ax && gameBoard[q][w] === ax) {
             p++
             if (p === 5) { return 2 }
           }
@@ -292,7 +307,7 @@ function checkWinAI() {
 
       if (q < 11) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q + n][w] === 'x' && gameBoard[q][w] === 'x') {
+          if (gameBoard[q + n][w] === ax && gameBoard[q][w] === ax) {
             p++
             if (p === 5) { return 2 }
           }
@@ -311,7 +326,7 @@ function AI() {
     for (let w = 0; w < 15; w++) {
       if ((w < 11) && (q < 11)) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q + n][w + n] === 'x' && gameBoard[q][w] === '#' && gameBoard[q + 1][w + 1] === 'x') {
+          if (gameBoard[q + n][w + n] === ax && gameBoard[q][w] === j && gameBoard[q + 1][w + 1] === ax) {
             p++
           }
 
@@ -324,7 +339,7 @@ function AI() {
 
       if ((w < 11) && (q > 3)) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q - n][w + n] === 'x' && gameBoard[q][w] === '#' && gameBoard[q - 1][w + 1] === 'x') {
+          if (gameBoard[q - n][w + n] === ax && gameBoard[q][w] === j && gameBoard[q - 1][w + 1] === ax) {
             p++
           }
         }
@@ -336,7 +351,7 @@ function AI() {
 
       if ((w > 3) && (q > 3)) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q - n][w - n] === 'x' && gameBoard[q][w] === '#' && gameBoard[q - 1][w - 1] === 'x') {
+          if (gameBoard[q - n][w - n] === ax && gameBoard[q][w] === j && gameBoard[q - 1][w - 1] === ax) {
             p++
           }
         }
@@ -348,7 +363,7 @@ function AI() {
 
       if ((w > 3) && q < 11) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q + n][w - n] === 'x' && gameBoard[q][w] === '#' && gameBoard[q + 1][w - 1] === 'x') {
+          if (gameBoard[q + n][w - n] === ax && gameBoard[q][w] === j && gameBoard[q + 1][w - 1] === ax) {
             p++
           }
         }
@@ -360,7 +375,7 @@ function AI() {
 
       if (w > 3) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q][w - n] === 'x' && gameBoard[q][w] === '#' && gameBoard[q][w - 1] === 'x') {
+          if (gameBoard[q][w - n] === ax && gameBoard[q][w] === j && gameBoard[q][w - 1] === ax) {
             p++
           }
         }
@@ -372,7 +387,7 @@ function AI() {
 
       if (w < 11) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q][w + n] === 'x' && gameBoard[q][w] === '#' && gameBoard[q][w + 1] === 'x') {
+          if (gameBoard[q][w + n] === ax && gameBoard[q][w] === j && gameBoard[q][w + 1] === ax) {
             p++
           }
         }
@@ -384,7 +399,7 @@ function AI() {
 
       if (q > 3) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q - n][w] === 'x' && gameBoard[q][w] === '#' && gameBoard[q - 1][w] === 'x') {
+          if (gameBoard[q - n][w] === ax && gameBoard[q][w] === j && gameBoard[q - 1][w] === ax) {
             p++
           }
         }
@@ -396,7 +411,7 @@ function AI() {
 
       if (q < 11) {
         for (let n = 0; n < 5; n++) {
-          if (gameBoard[q + n][w] === 'x' && gameBoard[q][w] === '#' && gameBoard[q + 1][w] === 'x') {
+          if (gameBoard[q + n][w] === ax && gameBoard[q][w] === j && gameBoard[q + 1][w] === ax) {
             p++
           }
         }
@@ -407,7 +422,7 @@ function AI() {
       }
     }
   }
-  gameBoard[xy[0]][xy[1]] = "x"
+  gameBoard[xy[0]][xy[1]] = ax
   posibility = [0]
   xy = [0, 0]
 }
@@ -420,9 +435,11 @@ box.key('r', function (ch, key) {
 });
 
 function retry() {
-  gameBoard = retryBoard
-  checkWin()
+  gameBoard = []
+  makeMainList(gameBoard);
   screen.render();
+  currentGame = gameBoard.slice(0);
+  gameBoard[7][7] = ax
 }
 
 const joinArray = (board) => {
@@ -432,27 +449,30 @@ const joinArray = (board) => {
   currentGame = board.join('');
 }
 
-const main = () => {
-  makeMainList();
+
+
+function main() {
+  makeMainList(gameBoard);
   screen.render();
   currentGame = gameBoard.slice(0);
-  program.move(7, 7);
-  gameBoard[7][7] = "x"
+  gameBoard[7][7] = ax
 }
 
-main();
+main()
+
 
 setInterval(() => {
-  currentGame = gameBoard.slice(0);
-  joinArray(currentGame);
-  if (checkWin() === 0 && checkWinAI() === 0) {
-    box.setContent(currentGame)
-  }
-  else if (checkWin() === 1) {
-    box.setContent("you win!\nfor quit press \"q\".");
-  }
-  else if (checkWinAI() === 2) {
-    box.setContent("you lose!\nfor quit press \"q\".");
-  }
-  screen.render();
+    currentGame = gameBoard.slice(0);
+    joinArray(currentGame);
+    if (checkWin() === 0 && checkWinAI() === 0) {
+      box.setContent(currentGame)
+    }
+    else if (checkWin() === 1) {
+      box.setContent("you win!\nfor quit press \"q\".");
+    }
+    else if (checkWinAI() === 2) {
+      box.setContent("you lose!\nfor quit press \"q\".");
+    }
+    screen.render();
+  
 }, 100)
