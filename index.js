@@ -1,4 +1,4 @@
-'use strict'
+//'use strict'
 
 var blessed = require('blessed')
   , program = blessed.program();
@@ -13,8 +13,8 @@ let retryBoard = []
 let posibility = [0]
 let xy = [0, 0]
 let j = "_"
-let ax = "x"
-let ao = "o"
+let ax = "\033[33mx\033[0m"
+let ao = "\033[34mo\033[0m"
 
 
 const screen = blessed.screen({
@@ -53,13 +53,13 @@ screen.on('keypress', function (data, key) {
     }}
   }
   if (key.name === 'g') {
-    if (ax === "x"){
-      ax = "o"
-      ao = "x"
+    if (ax === "\033[33mx\033[0m"){
+      ax = "\033[34mo\033[0m"
+      ao = "\033[33mx\033[0m"
     }
-    else if (ax === "o"){
-      ax = "x"
-      ao = "o"
+    else if (ax === "\033[34mo\033[0m"){
+      ax = "\033[33mx\033[0m"
+      ao = "\033[34mo\033[0m"
     }
     retry()
   }
